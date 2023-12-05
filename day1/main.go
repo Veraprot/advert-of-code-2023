@@ -1,6 +1,8 @@
 package main
 
 import (
+	"fmt"
+	"os"
 	"regexp"
 	"strconv"
 	"strings"
@@ -8,10 +10,14 @@ import (
 
 func main() {
 	// change to input after pass tests
-	calibrationDocument := "eightqrssm9httwogqshfxninepnfrppfzhsc\none111jxlmc7tvklrmhdpsix\nbptwone4sixzzppg\nninezfzseveneight5kjrjvtfjqt5nineone"
+	calibrationDocument, err := os.ReadFile("input.txt")
+	if err != nil {
+		panic(err)
+	}
 
-	calibrationLines := strings.Split(calibrationDocument, "\n")
-	countCalibrationValues(calibrationLines)
+	calibrationLines := strings.Split(string(calibrationDocument), "\n")
+	result := countCalibrationValues(calibrationLines)
+	fmt.Println(result)
 }
 
 func countCalibrationValues(s []string) int {
