@@ -2,21 +2,34 @@ package main
 
 import (
 	"fmt"
+	"regexp"
 	"strings"
 )
 
 func main() {
-	fmt.Println("day 1")
-	calibrationDocument := "eightqrssm9httwogqshfxninepnfrppfzhsc \n one111jxlmc7tvklrmhdpsix \n bptwone4sixzzppg \n ninezfzseveneight5kjrjvtfjqt5nineone"
+	// change to input after pass tests
+	calibrationDocument := "eightqrssm9httwogqshfxninepnfrppfzhsc\none111jxlmc7tvklrmhdpsix\nbptwone4sixzzppg\nninezfzseveneight5kjrjvtfjqt5nineone"
 
 	calibrationLines := strings.Split(calibrationDocument, "\n")
-	fmt.Println(calibrationLines[0])
+	countCalibrationValues(calibrationLines)
+}
+
+func countCalibrationValues(s []string) {
+	for _, calibrationLine := range s {
+		fmt.Println(calibrationLine)
+		GetCalibrationValue(calibrationLine)
+	}
 }
 
 func GetCalibrationValue(s string) string {
-	return s
-}
+	re := regexp.MustCompile("[0-9]")
+	numValues := re.FindAllString(s, -1)
 
-// for each line run algo and return result
-// add result to final result
-// print result
+	fmt.Println(numValues)
+
+	if len(numValues) == 0 {
+		return "0"
+	}
+
+	return numValues[0] + numValues[len(numValues)-1]
+}
