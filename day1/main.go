@@ -16,14 +16,17 @@ func main() {
 	}
 
 	calibrationLines := strings.Split(string(calibrationDocument), "\n")
+
 	result := countCalibrationValues(calibrationLines)
 	fmt.Println(result)
 }
 
 func countCalibrationValues(s []string) int {
 	result := 0
+
 	for _, calibrationLine := range s {
-		lineValue := GetCalibrationValue(calibrationLine)
+		lineMatches := findMatches(calibrationLine)
+		lineValue := GetCalibrationValue(lineMatches)
 
 		i, err := strconv.Atoi(lineValue)
 		if err != nil {
@@ -36,8 +39,25 @@ func countCalibrationValues(s []string) int {
 	return result
 }
 
-func GetCalibrationValue(s string) string {
+func findMatches(text string) []string {
+	pattern := `[0-9]|one|two|three|four|five|six|seven|eight|nine`
+	re := regexp.MustCompile(pattern)
 
+	var matches []string
+	for start := 0; start < len(text); {
+		loc := re.FindStringIndex(text[start:])
+		if loc == nil {
+			break
+		}
+		match := text[start+loc[0] : start+loc[1]]
+		matches = append(matches, match)
+
+		start += loc[0] + 1
+	}
+	return matches
+}
+
+func GetCalibrationValue(matches []string) string {
 	digitMap := map[string]string{
 		"one":   "1",
 		"two":   "2",
@@ -50,19 +70,15 @@ func GetCalibrationValue(s string) string {
 		"nine":  "9",
 	}
 
-	re := regexp.MustCompile("[0-9]|one|two|three|four|five|six|seven|eight|nine")
-
-	digitValues := re.FindAllString(s, -1)
-
-	if len(digitValues) == 0 {
+	if len(matches) == 0 {
 		return "0"
 	}
 
-	for i, digit := range digitValues {
+	for i, digit := range matches {
 		if digitMap[digit] != "" {
-			digitValues[i] = digitMap[digit]
+			matches[i] = digitMap[digit]
 		}
 	}
 
-	return digitValues[0] + digitValues[len(digitValues)-1]
+	return matches[0] + matches[len(matches)-1]
 }

@@ -36,4 +36,5 @@ func TestCountCalibrationValues(t *testing.T) {
 	test([]string{"4nineeightseven2"}, 42)
 	test([]string{"zoneight234"}, 14)
 	test([]string{"7pqrstsixteen"}, 76)
+	test([]string{"eightwo"}, 82)
 }
