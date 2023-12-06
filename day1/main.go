@@ -37,12 +37,32 @@ func countCalibrationValues(s []string) int {
 }
 
 func GetCalibrationValue(s string) string {
-	re := regexp.MustCompile("[0-9]")
-	numValues := re.FindAllString(s, -1)
 
-	if len(numValues) == 0 {
+	digitMap := map[string]string{
+		"one":   "1",
+		"two":   "2",
+		"three": "3",
+		"four":  "4",
+		"five":  "5",
+		"six":   "6",
+		"seven": "7",
+		"eight": "8",
+		"nine":  "9",
+	}
+
+	re := regexp.MustCompile("[0-9]|one|two|three|four|five|six|seven|eight|nine")
+
+	digitValues := re.FindAllString(s, -1)
+
+	if len(digitValues) == 0 {
 		return "0"
 	}
 
-	return numValues[0] + numValues[len(numValues)-1]
+	for i, digit := range digitValues {
+		if digitMap[digit] != "" {
+			digitValues[i] = digitMap[digit]
+		}
+	}
+
+	return digitValues[0] + digitValues[len(digitValues)-1]
 }
