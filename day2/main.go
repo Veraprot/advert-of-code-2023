@@ -9,7 +9,7 @@ import (
 )
 
 func main() {
-	input, err := os.ReadFile("input.txt")
+	input, err := os.ReadFile("test.txt")
 	games := strings.Split(string(input), "\n")
 
 	if err != nil {
@@ -18,27 +18,24 @@ func main() {
 
 	eligibleGamesCount := 0
 	for _, game := range games {
-		gameId, eligible := playGameRound(game)
-		if eligible {
-			eligibleGamesCount += gameId
-		}
+		gameCount := playGameRound(game)
+		eligibleGamesCount += gameCount
 	}
 	fmt.Println(eligibleGamesCount)
 }
 
-func playGameRound(s string) (int, bool) {
+func playGameRound(s string) int {
 	re := regexp.MustCompile(`[;:]`)
 	gameRoundsData := re.Split(s, -1)
-	gameId := getGameId(gameRoundsData[0])
 	rounds := gameRoundsData[1:]
-
+	minMap := map[string]int{"blue": 0, "green": 0, "red": 0}
 	for i := 0; i < len(rounds); i++ {
-		if checkGameRound(rounds[i]) == false {
-			return gameId, false
-		}
+		colorMap := getRoundData(rounds[i])
+		minMap = countMinColorCubes(minMap, colorMap)
 	}
 
-	return gameId, true
+	gameCount := calculateGameValue(minMap)
+	return gameCount
 }
 
 func getTargetNum() map[string]int {
@@ -46,12 +43,35 @@ func getTargetNum() map[string]int {
 	return gameTarget
 }
 
-func checkGameRound(s string) bool {
+func countMinColorCubes(m, c map[string]int) map[string]int {
+	result := map[string]int{}
+
+	for color, value := range c {
+		if m[color] < value {
+			result[color] = value
+		} else {
+			result[color] = m[color]
+		}
+	}
+
+	return result
+}
+
+func calculateGameValue(m map[string]int) int {
+	result := 0
+	for _, value := range m {
+		result *= value
+	}
+
+	return result
+}
+
+func getRoundData(s string) map[string]int {
 	formattedRounds := strings.TrimSpace(s)
 	re := regexp.MustCompile(`[,]`)
 	roundColors := re.Split(formattedRounds, -1)
+	colorMap := map[string]int{}
 
-	target := getTargetNum()
 	for _, roundColor := range roundColors {
 		formatted := strings.TrimSpace(roundColor)
 		str := strings.Split(formatted, " ")
@@ -62,12 +82,10 @@ func checkGameRound(s string) bool {
 			panic(err)
 		}
 
-		if target[cName] < cValue {
-			return false
-		}
+		colorMap[cName] = cValue
 	}
 
-	return true
+	return colorMap
 }
 
 func getGameId(g string) int {
