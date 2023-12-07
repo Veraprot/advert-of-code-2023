@@ -44,7 +44,7 @@ func getTargetNum() map[string]int {
 }
 
 func countMinColorCubes(m, c map[string]int) map[string]int {
-	result := map[string]int{}
+	result := m
 
 	for color, value := range c {
 		if m[color] < value {
@@ -59,16 +59,9 @@ func countMinColorCubes(m, c map[string]int) map[string]int {
 
 func calculateGameValue(m map[string]int) int {
 	result := 1
-	target := getTargetNum()
-	for color, value := range m {
-		if target[color] < value {
-			result *= 0
-		} else {
-			result *= value
-
-		}
+	for _, value := range m {
+		result *= value
 	}
-
 	return result
 }
 
