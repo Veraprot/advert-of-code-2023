@@ -9,7 +9,7 @@ import (
 )
 
 func main() {
-	input, err := os.ReadFile("test.txt")
+	input, err := os.ReadFile("input.txt")
 	games := strings.Split(string(input), "\n")
 
 	if err != nil {
@@ -58,9 +58,15 @@ func countMinColorCubes(m, c map[string]int) map[string]int {
 }
 
 func calculateGameValue(m map[string]int) int {
-	result := 0
-	for _, value := range m {
-		result *= value
+	result := 1
+	target := getTargetNum()
+	for color, value := range m {
+		if target[color] < value {
+			result *= 0
+		} else {
+			result *= value
+
+		}
 	}
 
 	return result
