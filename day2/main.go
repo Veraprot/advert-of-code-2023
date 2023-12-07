@@ -23,7 +23,6 @@ func main() {
 			eligibleGamesCount += gameId
 		}
 	}
-	fmt.Println("--------")
 	fmt.Println(eligibleGamesCount)
 }
 
@@ -72,8 +71,7 @@ func checkGameRound(s string) bool {
 }
 
 func getGameId(g string) int {
-	gameIdStr := string(g[len(g)-1])
-
+	gameIdStr := string(g[5:])
 	gameId, err := strconv.Atoi(gameIdStr)
 	if err != nil {
 		panic(err)
