@@ -27,3 +27,93 @@ In this schematic, two numbers are not part numbers because they are not adjacen
 
 Of course, the actual engine schematic is much larger. What is the sum of all of the part numbers in the engine schematic?
 
+
+test notes: 
+
+func test() {
+	goFile, goErr := os.ReadFile("nums-go.txt")
+	if goErr != nil {
+		panic(goErr)
+	}
+	goStr := strings.Split(string(goFile), " ")
+
+	jsFile, err := os.ReadFile("nums-js.txt")
+	if err != nil {
+		panic(err)
+	}
+	jsStr := strings.Split(string(jsFile), " ")
+
+	for i, char := range jsStr {
+		if goStr[i] != char {
+			fmt.Println(i, char)
+			fmt.Println(goStr[i], goStr[i-1])
+			return
+		}
+	}
+}
+
+func Ints(input []string) []string {
+	u := make([]string, 0, len(input))
+	m := make(map[string]bool)
+
+	for _, val := range input {
+		if _, ok := m[val]; !ok {
+			m[val] = true
+			u = append(u, val)
+		}
+	}
+
+	return u
+}
+
+import fs from 'fs';
+
+fs.readFile("./input.txt", (e, data) => {
+  const symbols = []
+  const numbers = []
+
+  const lines = data.toString().split(/\n/)
+  lines.forEach(line => {
+    const symbolMatch = [...line.matchAll(/([^\d\.])/g)]
+    if (symbolMatch.length == 0) symbols.push([])
+    else symbols.push(symbolMatch.map(o => o.index))
+  
+    const numberMatch = [...line.matchAll(/(\d+)/g)]
+    if (numberMatch.length == 0)  numbers.push([])
+    else numbers.push(numberMatch.map(obj => {
+      return {
+        index: obj.index,
+        number: parseInt(obj[0]),
+        length: obj[0].length
+      }
+    }))
+  })
+  
+  let numString = ""
+  const partNumbersSum = numbers.reduce((acc, numArr, i) => {
+    let rowAcc = numArr.reduce((racc, numObj) => {
+      const { index, number, length } = numObj
+      const currRowSymbolIndicies = symbols[i]
+      const upperRowSymbolIndicies = symbols[i-1] || []
+      const lowerRowSymbolIndicies = symbols[i+1] || []
+      let isPartNumber = false
+      for (let j = 0; j < length; j++) {
+        const digitIndex = index + j
+        if (
+        [digitIndex-1, digitIndex+1].some(ni => currRowSymbolIndicies.includes(ni)) ||
+        [digitIndex, digitIndex-1, digitIndex+1].some(ni => upperRowSymbolIndicies.includes(ni)) ||
+        [digitIndex, digitIndex-1, digitIndex+1].some(ni => lowerRowSymbolIndicies.includes(ni))
+        ) {
+          isPartNumber = true
+          numString += `${number} `
+        }
+      }
+      return isPartNumber
+      ? racc + number
+      : racc
+    }, 0)
+    return acc + rowAcc
+  }, 0)
+  console.log(numString)
+  console.log(partNumbersSum)
+})

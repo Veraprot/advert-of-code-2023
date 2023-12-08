@@ -9,7 +9,6 @@ import (
 )
 
 func main() {
-	// change to input after pass tests
 	engineSchema, err := os.ReadFile("input.txt")
 	if err != nil {
 		panic(err)
@@ -30,13 +29,25 @@ func traverseEngineTable(table [][]string) {
 	result := 0
 	for r, row := range table {
 		tempNumberStr := ""
-		isNumAdjacent := true
+		isNumAdjacent := false
 		for c, column := range row {
 			isColumnNumeric := regexp.MustCompile(`\d`).MatchString(column)
+
 			if isColumnNumeric {
 				tempNumberStr += column
 				if checkNeighborCellsSymbols(table, r, c) == true {
 					isNumAdjacent = true
+				}
+
+				if c == len(row)-1 {
+					if len(tempNumberStr) > 0 && isNumAdjacent {
+						i, err := strconv.Atoi(tempNumberStr)
+						if err != nil {
+							panic(err)
+						}
+						result += i
+						fmt.Print(i, " ")
+					}
 				}
 			} else {
 				if len(tempNumberStr) > 0 && isNumAdjacent {
@@ -44,8 +55,8 @@ func traverseEngineTable(table [][]string) {
 					if err != nil {
 						panic(err)
 					}
-
 					result += i
+					fmt.Print(i, " ")
 				}
 				tempNumberStr = ""
 				isNumAdjacent = false
