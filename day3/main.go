@@ -96,7 +96,6 @@ func countGears(table [][]string) {
 				gearCoordinates = coordinates
 				if hasNeighbors == true {
 					isNumAdjacent = true
-					fmt.Println(tempNumberStr, coordinates)
 				}
 
 				// apply logic for adding gear here
@@ -179,8 +178,7 @@ func checkNeighborCellsSymbols(table [][]string, row int, column int, pattern st
 }
 
 func checkNeighborCells(table [][]string, row int, column int, pattern string) (bool, []string) {
-	neighbors := make([]string, 0)
-
+	neighbors := []string{}
 	for i := -1; i <= 1; i++ {
 		for j := -1; j <= 1; j++ {
 			newRow, newCol := row+i, column+j
@@ -202,11 +200,15 @@ func checkNeighborCells(table [][]string, row int, column int, pattern string) (
 				if re.MatchString(table[newRow][newCol]) {
 					coordinates := strconv.Itoa(newRow) + strconv.Itoa(newCol)
 					neighbors = append(neighbors, coordinates)
-					return true, neighbors
 				}
 			}
 		}
 	}
 
-	return false, neighbors
+	if len(neighbors) > 0 {
+		return true, neighbors
+	} else {
+
+		return false, neighbors
+	}
 }
