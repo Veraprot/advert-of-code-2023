@@ -15,8 +15,8 @@ func main() {
 	}
 
 	card := strings.Split(string(lotteryCards), "\n")
-	cardPoints := 0
-	for _, c := range card {
+	cardPoints := map[int]int{}
+	for i, c := range card {
 		cardSections := strings.Split(string(c), "|")
 		winningNumStrings := strings.Split(string(cardSections[0]), ":")[1]
 		playerNumStrings := cardSections[1]
@@ -24,9 +24,9 @@ func main() {
 
 		winningNumbers := formatCardString(winningNumStrings)
 		playerNumbers := formatCardString(playerNumStrings)
-		cardPoints += countCardPoints(winningNumbers, playerNumbers)
+		cardPoints[i] = countCardPoints(winningNumbers, playerNumbers)
 	}
-	fmt.Println(cardPoints)
+	countScratchcards(cardPoints)
 }
 
 func formatCardString(c string) []int {
@@ -49,26 +49,36 @@ func formatCardString(c string) []int {
 	return cardNumbers
 }
 
+func countScratchcards(cardMap map[int]int) {
+	copies := map[int]int{0: 0}
+
+	for i := 0; i < len(cardMap); i++ {
+		copies[i] += 1
+		for j := 1; j <= cardMap[i]; j++ {
+			copies[i+j] += copies[i]
+		}
+	}
+	result := 0
+	for _, value := range copies {
+		result += value
+	}
+
+	fmt.Println(result)
+}
+
 func countCardPoints(wStr []int, pStr []int) int {
 	sort.Ints(wStr)
 	sort.Ints(pStr)
-	fmt.Println(wStr, "______", pStr)
 
 	cardPoints := 0
 	winPointer := 0
 	playerPointer := 0
 
 	for winPointer < len(wStr) || playerPointer < len(pStr) {
-		fmt.Print("new iteration ")
-		fmt.Println(wStr[winPointer], pStr[playerPointer], cardPoints)
 		// last iteration
 		if winPointer == len(wStr)-1 && playerPointer == len(pStr)-1 {
 			if wStr[winPointer] == pStr[playerPointer] {
-				if cardPoints == 0 {
-					cardPoints += 1
-				} else {
-					cardPoints *= 2
-				}
+				cardPoints += 1
 			}
 
 			winPointer += 1
@@ -79,20 +89,12 @@ func countCardPoints(wStr []int, pStr []int) int {
 		// if either one of the pointers reaches the end of the list, let the other one catch up
 		if winPointer == len(wStr)-1 && playerPointer < len(pStr)-1 {
 			if wStr[winPointer] == pStr[playerPointer] {
-				if cardPoints == 0 {
-					cardPoints += 1
-				} else {
-					cardPoints *= 2
-				}
+				cardPoints += 1
 			}
 			playerPointer += 1
 		} else if playerPointer == len(pStr)-1 && winPointer < len(wStr)-1 {
 			if wStr[winPointer] == pStr[playerPointer] {
-				if cardPoints == 0 {
-					cardPoints += 1
-				} else {
-					cardPoints *= 2
-				}
+				cardPoints += 1
 			}
 			winPointer += 1
 		} else {
@@ -104,11 +106,7 @@ func countCardPoints(wStr []int, pStr []int) int {
 }
 func checkNumbers(cardPoints int, wStr []int, pStr []int, winPointer int, playerPointer int) (int, int, int) {
 	if wStr[winPointer] == pStr[playerPointer] {
-		if cardPoints == 0 {
-			cardPoints += 1
-		} else {
-			cardPoints *= 2
-		}
+		cardPoints += 1
 
 		winPointer = movePointer(winPointer, wStr)
 		playerPointer = movePointer(playerPointer, pStr)
